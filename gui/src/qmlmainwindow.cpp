@@ -1,3 +1,5 @@
+#include <type_traits>
+
 #include "qmlmainwindow.h"
 #include "qmlbackend.h"
 #include "qmlsvgprovider.h"
@@ -6682,7 +6684,9 @@ void QmlMainWindow::render()
     int queue_depth_before_update = -1;
     struct pl_frame direct_render_frame = {};
     const struct pl_frame *direct_frames[] = { &direct_render_frame };
-    const float direct_timestamps[] = { 0.0f };
+    // libplacebo changed pl_frame_mix.timestamps from float to double; follow whichever type the installed version uses.
+    using pl_timestamp_t = std::remove_cv_t<std::remove_pointer_t<decltype(frame_mix.timestamps)>>;
+    const pl_timestamp_t direct_timestamps[] = { static_cast<pl_timestamp_t>(0) };
     if (bypass_frame_queue) {
         AVFrame *incoming = nullptr;
         bool reset_direct_frame = false;
