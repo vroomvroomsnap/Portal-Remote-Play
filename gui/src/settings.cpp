@@ -523,14 +523,14 @@ ChiakiVideoFPSPreset Settings::GetFPSRemotePS4() const
 
 ChiakiVideoFPSPreset Settings::GetFPSLocalPS5() const
 {
-	auto v = settings.value("settings/fps_local_ps5", fps_values[fps_default]).toInt();
-	return fps_values.key(v, fps_default);
+	// Portal Remote Play: always request the protocol maximum (60). The console sends the
+	// game's actual frame rate up to this cap, so a 30 fps game stays at 30 and a 60 fps game gets 60.
+	return fps_default;
 }
 
 ChiakiVideoFPSPreset Settings::GetFPSRemotePS5() const
 {
-	auto v = settings.value("settings/fps_remote_ps5", fps_values[fps_default]).toInt();
-	return fps_values.key(v, fps_default);
+	return fps_default;
 }
 
 void Settings::SetFPSLocalPS4(ChiakiVideoFPSPreset fps)

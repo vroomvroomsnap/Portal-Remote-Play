@@ -1219,7 +1219,7 @@ DialogView {
                         visible: selectedConsole == SettingsDialog.Console.PS5
                         KeyNavigation.right: resolutionRemotePS5
                         KeyNavigation.up: consoleSelection
-                        KeyNavigation.down: fpsLocalPS5
+                        KeyNavigation.down: bitrateLocalPS5
                         KeyNavigation.priority: {
                             if(!popup.visible)
                                 KeyNavigation.BeforeItem
@@ -1240,7 +1240,7 @@ DialogView {
                         visible: selectedConsole == SettingsDialog.Console.PS5
                         KeyNavigation.left: resolutionLocalPS5
                         KeyNavigation.up: consoleSelection
-                        KeyNavigation.down: fpsRemotePS5
+                        KeyNavigation.down: bitrateRemotePS5
                         KeyNavigation.priority: {
                             if(!popup.visible)
                                 KeyNavigation.BeforeItem
@@ -1252,6 +1252,8 @@ DialogView {
                     Label {
                         Layout.alignment: Qt.AlignRight
                         text: qsTr("FPS:")
+                        // PS5 always requests the maximum (60); the console sends whatever the game outputs.
+                        visible: selectedConsole == SettingsDialog.Console.PS4
                     }
 
                     C.ComboBox {
@@ -1296,7 +1298,7 @@ DialogView {
                         model: [qsTr("30 fps"), qsTr("60 fps (Default)")]
                         currentIndex: (Chiaki.settings.fpsLocalPS5 / 30) - 1
                         onActivated: (index) => Chiaki.settings.fpsLocalPS5 = (index + 1) * 30
-                        visible: selectedConsole == SettingsDialog.Console.PS5
+                        visible: false
                         KeyNavigation.up: resolutionLocalPS5
                         KeyNavigation.right: fpsRemotePS5
                         KeyNavigation.down: bitrateLocalPS5
@@ -1314,7 +1316,7 @@ DialogView {
                         model: [qsTr("30 fps"), qsTr("60 fps (Default)")]
                         currentIndex: (Chiaki.settings.fpsRemotePS5 / 30) - 1
                         onActivated: (index) => Chiaki.settings.fpsRemotePS5 = (index + 1) * 30
-                        visible: selectedConsole == SettingsDialog.Console.PS5
+                        visible: false
                         KeyNavigation.up: resolutionRemotePS5
                         KeyNavigation.left: fpsLocalPS5
                         KeyNavigation.down: bitrateRemotePS5
@@ -1416,7 +1418,7 @@ DialogView {
                         stepSize: 1
                         value: Chiaki.settings.bitrateLocalPS5 / 1000 ? (Chiaki.settings.bitrateLocalPS5 / 1000) : bitrate
                         onMoved: Chiaki.settings.bitrateLocalPS5 = value * 1000;
-                        KeyNavigation.up: fpsLocalPS5
+                        KeyNavigation.up: resolutionLocalPS5
                         KeyNavigation.down: codecLocalPS5
                         KeyNavigation.priority: KeyNavigation.BeforeItem
 
@@ -1449,7 +1451,7 @@ DialogView {
                         stepSize: 1
                         value: Chiaki.settings.bitrateRemotePS5 / 1000 ? (Chiaki.settings.bitrateRemotePS5 / 1000) : bitrate
                         onMoved: Chiaki.settings.bitrateRemotePS5 = value * 1000;
-                        KeyNavigation.up: fpsRemotePS5
+                        KeyNavigation.up: resolutionRemotePS5
                         KeyNavigation.down: codecRemotePS5
                         KeyNavigation.priority: KeyNavigation.BeforeItem
                         lastInFocusChain: true
