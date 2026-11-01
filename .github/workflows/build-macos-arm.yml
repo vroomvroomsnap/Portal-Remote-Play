@@ -30,6 +30,10 @@ jobs:
         run: |
           brew list --versions | grep -i openssl || true
           ls -ld /opt/homebrew/include/openssl /opt/homebrew/opt/openssl@3 || true
+          # Another formula links OpenSSL 4 into /opt/homebrew/include; chiaki-ng needs OpenSSL 3 headers to match the library it links.
+          brew unlink openssl@4 || true
+          brew link --overwrite --force openssl@3
+          ls -ld /opt/homebrew/include/openssl /opt/homebrew/lib/libcrypto.dylib || true
 
       - name: Configure chiaki-ng
         run: |
