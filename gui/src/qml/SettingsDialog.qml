@@ -1406,7 +1406,7 @@ DialogView {
                             case 1: rate = 2; break; // 360p
                             case 2: rate = 6; break; // 540p
                             case 3: rate = 10; break; // 720p
-                            case 4: rate = 15; break; // 1080p
+                            case 4: rate = 30; break; // 1080p (Portal Remote Play default)
                             }
                             return rate;
                         }

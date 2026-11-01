@@ -456,7 +456,7 @@ static const QMap<ChiakiVideoResolutionPreset, QString> resolutions = {
 
 static const ChiakiVideoResolutionPreset resolution_default_ps4 = CHIAKI_VIDEO_RESOLUTION_PRESET_720p;
 static const ChiakiVideoResolutionPreset resolution_default_ps5_local = CHIAKI_VIDEO_RESOLUTION_PRESET_1080p;
-static const ChiakiVideoResolutionPreset resolution_default_ps5_remote = CHIAKI_VIDEO_RESOLUTION_PRESET_720p;
+static const ChiakiVideoResolutionPreset resolution_default_ps5_remote = CHIAKI_VIDEO_RESOLUTION_PRESET_1080p;
 
 ChiakiVideoResolutionPreset Settings::GetResolutionLocalPS4() const
 {
@@ -1137,6 +1137,8 @@ ChiakiConnectVideoProfile Settings::GetVideoProfileLocalPS5()
 	unsigned int bitrate = GetBitrateLocalPS5();
 	if(bitrate)
 		profile.bitrate = bitrate;
+	else if(GetResolutionLocalPS5() == CHIAKI_VIDEO_RESOLUTION_PRESET_1080p)
+		profile.bitrate = 30000; // Portal Remote Play default: 30 Mbps for 1080p on the home network (was 15 Mbps)
 	profile.codec = GetCodecLocalPS5();
 	return profile;
 }
