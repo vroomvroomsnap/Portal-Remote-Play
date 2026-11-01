@@ -25,9 +25,14 @@ jobs:
           sudo INSTALL_PREFIX=/usr/local scripts/build-sdl2-compat.sh
           sudo cp /usr/local/lib/pkgconfig/sdl2-compat.pc /usr/local/lib/pkgconfig/sdl2.pc
 
+      - name: Diagnose OpenSSL
+        run: |
+          brew list --versions | grep -i openssl || true
+          ls -ld /opt/homebrew/include/openssl /opt/homebrew/opt/openssl@3 || true
+
       - name: Configure chiaki-ng
         run: |
-          cmake -S . -B build -G "Ninja" -DCMAKE_BUILD_TYPE=Release -DCHIAKI_ENABLE_CLI=OFF -DCHIAKI_ENABLE_STEAMDECK_NATIVE=OFF -DOPENSSL_ROOT_DIR="$(brew --prefix)/opt/openssl@3" -DCMAKE_PREFIX_PATH="$(brew --prefix)/opt/openssl@3;$(brew --prefix)/opt/qt@6;$(brew --prefix)/opt/protobuf@29"
+          cmake -S . -B build -G "Ninja" -DCMAKE_BUILD_TYPE=Release -DCHIAKI_ENABLE_CLI=OFF -DCHIAKI_ENABLE_STEAMDECK_NATIVE=OFF -DOPENSSL_ROOT_DIR="$(brew --prefix)/opt/openssl@3" -DOPENSSL_INCLUDE_DIR="$(brew --prefix)/opt/openssl@3/include" -DCMAKE_C_FLAGS="-I$(brew --prefix)/opt/openssl@3/include" -DCMAKE_CXX_FLAGS="-I$(brew --prefix)/opt/openssl@3/include" -DCMAKE_PREFIX_PATH="$(brew --prefix)/opt/openssl@3;$(brew --prefix)/opt/qt@6;$(brew --prefix)/opt/protobuf@29"
 
       - name: Build chiaki-ng
         run: |
