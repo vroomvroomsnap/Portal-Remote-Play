@@ -2018,6 +2018,7 @@ DialogView {
                         }
 
                         C.CheckBox {
+                            Layout.preferredWidth: 460
                             checked: Chiaki.settings.iDROnFECFailureEnabled
                             onToggled: Chiaki.settings.iDROnFECFailureEnabled = !Chiaki.settings.iDROnFECFailureEnabled
                         }
@@ -2033,6 +2034,7 @@ DialogView {
                         }
 
                         C.CheckBox {
+                            Layout.preferredWidth: 460
                             lastInFocusChain: true
                             checked: Chiaki.settings.showStreamStats
                             onToggled: Chiaki.settings.showStreamStats = !Chiaki.settings.showStreamStats

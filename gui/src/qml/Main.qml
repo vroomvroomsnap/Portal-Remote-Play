@@ -15,7 +15,7 @@ Item {
     // Resolved light/dark (also correct when Appearance is "System")
     readonly property bool darkMode: Material.foreground.hslLightness > 0.5
     // Neutral, Apple-like palette with a PlayStation-blue accent (replaces the stock indigo header)
-    Material.accent: darkMode ? "#3EA0FF" : "#0070D1"
+    Material.accent: darkMode ? "#3EA0FF" : "#2F8CFF"
     Material.primary: darkMode ? "#1C1C1E" : "#F2F2F7"
 
     function controllerButton(name) {
