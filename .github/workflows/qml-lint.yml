@@ -26,7 +26,7 @@ jobs:
           echo "Using $QMLLINT"
           fail=0
           for f in gui/src/qml/*.qml; do
-            out=$("$QMLLINT" "$f" 2>&1)
+            out=$("$QMLLINT" "$f" 2>&1) || true
             # Only real parse errors fail the job. Unknown module / unqualified-access warnings are expected
             # because the app's own C++ types (org.streetpea.chiaking) are not available on this runner.
             if echo "$out" | grep -qiE "syntax|expected|unexpected|unterminated|duplicate|invalid"; then
