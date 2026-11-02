@@ -367,6 +367,10 @@ class Settings : public QObject
 		WindowType GetWindowType() const;
 		void SetWindowType(WindowType type);
 
+		// Appearance: 0 = follow macOS (System), 1 = Light, 2 = Dark
+		int GetThemeMode() const;
+		void SetThemeMode(int mode);
+
 		uint GetCustomResolutionWidth() const;
 		void SetCustomResolutionWidth(uint width);
 

@@ -11,7 +11,7 @@ Item {
     property bool initialAsk: false
     readonly property bool preferSeparateStreamSettingsWindows: Chiaki.window.runtimeRendererBackend === 1 && Chiaki.session
     property bool useSeparateStreamSettingsWindows: false
-    Material.theme: Material.Dark
+    Material.theme: Chiaki.settings.themeMode === 2 ? Material.Dark : (Chiaki.settings.themeMode === 0 ? Material.System : Material.Light)
     Material.accent: "#00a7ff"
 
     function controllerButton(name) {

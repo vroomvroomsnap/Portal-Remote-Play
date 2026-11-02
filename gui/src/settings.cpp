@@ -787,6 +787,17 @@ void Settings::SetWindowType(WindowType type)
 	settings.setValue("settings/window_type", window_type_values[type]);
 }
 
+int Settings::GetThemeMode() const
+{
+	int v = settings.value("settings/theme_mode", 1).toInt();
+	return (v >= 0 && v <= 2) ? v : 1;
+}
+
+void Settings::SetThemeMode(int mode)
+{
+	settings.setValue("settings/theme_mode", (mode >= 0 && mode <= 2) ? mode : 1);
+}
+
 uint Settings::GetCustomResolutionWidth() const
 {
 	return settings.value("settings/custom_resolution_width", 1920).toUInt();

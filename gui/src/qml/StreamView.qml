@@ -11,6 +11,10 @@ import "controls" as C
 Item {
     id: view
 
+    // The stream screen sits over game video with hard-coded black backgrounds and light text,
+    // so it always stays dark, whatever Appearance is chosen for the rest of the app.
+    Material.theme: Material.Dark
+
     readonly property var hostWindow: view.Window.window
     property bool sessionError: false
     property bool sessionLoading: true

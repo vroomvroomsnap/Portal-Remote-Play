@@ -56,6 +56,7 @@ class QmlSettings : public QObject
     Q_PROPERTY(bool useZeroCopy READ useZeroCopy WRITE setUseZeroCopy NOTIFY useZeroCopyChanged)
     Q_PROPERTY(bool vulkanDeferredSwap READ vulkanDeferredSwap WRITE setVulkanDeferredSwap NOTIFY vulkanDeferredSwapChanged)
     Q_PROPERTY(int windowType READ windowType WRITE setWindowType NOTIFY windowTypeChanged)
+    Q_PROPERTY(int themeMode READ themeMode WRITE setThemeMode NOTIFY themeModeChanged)
     Q_PROPERTY(uint customResolutionWidth READ customResolutionWidth WRITE setCustomResolutionWidth NOTIFY customResolutionWidthChanged)
     Q_PROPERTY(uint customResolutionHeight READ customResolutionHeight WRITE setCustomResolutionHeight NOTIFY customResolutionHeightChanged)
     Q_PROPERTY(int videoPreset READ videoPreset WRITE setVideoPreset NOTIFY videoPresetChanged)
@@ -300,6 +301,8 @@ public:
 
     int windowType() const;
     void setWindowType(int type);
+    int themeMode() const;
+    void setThemeMode(int mode);
 
     uint customResolutionWidth() const;
     void setCustomResolutionWidth(uint width);
@@ -668,6 +671,7 @@ signals:
     void decoderChanged();
     void useZeroCopyChanged();
     void windowTypeChanged();
+    void themeModeChanged();
     void customResolutionWidthChanged();
     void customResolutionHeightChanged();
     void sZoomFactorChanged();

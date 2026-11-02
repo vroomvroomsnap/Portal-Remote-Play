@@ -795,6 +795,24 @@ DialogView {
 
                     Label {
                         Layout.alignment: Qt.AlignRight
+                        text: qsTr("Appearance:")
+                    }
+
+                    C.ComboBox {
+                        id: themeModeCombo
+                        Layout.preferredWidth: 400
+                        model: [qsTr("System"), qsTr("Light"), qsTr("Dark")]
+                        currentIndex: Chiaki.settings.themeMode
+                        onActivated: (index) => Chiaki.settings.themeMode = index;
+                    }
+
+                    Label {
+                        Layout.alignment: Qt.AlignRight
+                        text: qsTr("(Light)")
+                    }
+
+                    Label {
+                        Layout.alignment: Qt.AlignRight
                         text: qsTr("Window Type:")
                     }
 

@@ -610,6 +610,17 @@ void QmlSettings::setWindowType(int type)
     emit windowTypeChanged();
 }
 
+int QmlSettings::themeMode() const
+{
+    return settings->GetThemeMode();
+}
+
+void QmlSettings::setThemeMode(int mode)
+{
+    settings->SetThemeMode(mode);
+    emit themeModeChanged();
+}
+
 uint QmlSettings::customResolutionWidth() const
 {
     return settings->GetCustomResolutionWidth();
@@ -1932,6 +1943,7 @@ void QmlSettings::refreshAllKeys()
     emit portGuessSocketCountChanged();
     emit decoderChanged();
     emit windowTypeChanged();
+    emit themeModeChanged();
     emit customResolutionWidthChanged();
     emit customResolutionHeightChanged();
     emit sZoomFactorChanged();
