@@ -787,6 +787,43 @@ void Settings::SetWindowType(WindowType type)
 	settings.setValue("settings/window_type", window_type_values[type]);
 }
 
+static bool IsEditableSettingKey(const QString &key)
+{
+	if(!key.startsWith("settings/"))
+		return false;
+	static const QStringList excluded = { "psn", "geometry", "profile", "auto_connect" };
+	for(const QString &part : excluded)
+		if(key.contains(part, Qt::CaseInsensitive))
+			return false;
+	return true;
+}
+
+QVariantMap Settings::SnapshotEditableSettings() const
+{
+	QVariantMap snapshot;
+	const QStringList keys = settings.allKeys();
+	for(const QString &key : keys)
+		if(IsEditableSettingKey(key))
+			snapshot.insert(key, settings.value(key));
+	return snapshot;
+}
+
+bool Settings::EditableSettingsDiffer(const QVariantMap &snapshot) const
+{
+	return SnapshotEditableSettings() != snapshot;
+}
+
+void Settings::RestoreEditableSettings(const QVariantMap &snapshot)
+{
+	const QStringList keys = settings.allKeys();
+	for(const QString &key : keys)
+		if(IsEditableSettingKey(key) && !snapshot.contains(key))
+			settings.remove(key);
+	for(auto it = snapshot.constBegin(); it != snapshot.constEnd(); ++it)
+		settings.setValue(it.key(), it.value());
+	settings.sync();
+}
+
 int Settings::GetThemeMode() const
 {
 	int v = settings.value("settings/theme_mode", 1).toInt();

@@ -15,6 +15,41 @@ DialogView {
         PS5
     }
     property int selectedConsole: SettingsDialog.Console.PS5
+    property bool dirty: false
+    property bool justSaved: false
+    property bool allowClose: false
+    buttonEnabled: dirty
+    closeGuard: () => dialog.guardUnsaved()
+    onAccepted: dialog.saveChanges()
+    Component.onCompleted: Chiaki.settings.beginEdit()
+    Component.onDestruction: Chiaki.settings.discardEditQuietly()
+
+    function saveChanges() {
+        Chiaki.settings.saveEdit();
+        dirty = false;
+        justSaved = true;
+        savedTimer.restart();
+    }
+    function discardChanges() {
+        Chiaki.settings.discardEdit();
+        dirty = false;
+        justSaved = false;
+    }
+    function guardUnsaved() {
+        if (allowClose)
+            return false;
+        dirty = Chiaki.settings.hasUnsavedChanges();
+        if (!dirty)
+            return false;
+        root.showConfirmDialog(qsTr("Unsaved changes"),
+                               qsTr("You have changes that haven't been saved.\nDiscard them and leave Settings?"),
+                               () => {
+                                   dialog.discardChanges();
+                                   dialog.allowClose = true;
+                                   dialog.close();
+                               });
+        return true;
+    }
     property bool quitControllerMapping: true
     id: dialog
     title: qsTr("Settings")
@@ -94,11 +129,12 @@ DialogView {
         case 1: item = hwDecoderCombo; break;
         case 2: item = consoleSelection; break;
         case 3: item = audioOutDevice; break;
-        case 4: item = registerNewButton; break;
-        case 5: item = resetAllKeys; break;
-        case 6: item = controllerMappingChange; break;
-        case 7: item = firstRemoteFocusableItem(); break;
-        case 8: item = profile; break;
+        case 4: item = weakWifiSlider; break;
+        case 5: item = registerNewButton; break;
+        case 6: item = resetAllKeys; break;
+        case 7: item = controllerMappingChange; break;
+        case 8: item = firstRemoteFocusableItem(); break;
+        case 9: item = profile; break;
         }
         if (item)
             item.forceActiveFocus(Qt.TabFocusReason);
@@ -108,12 +144,13 @@ DialogView {
         case 0: return generalFlick;
         case 1: return videoFlick;
         case 2: return streamFlick;
-        case 3: return audiowifiFlick;
-        case 4: return consolesFlick;
-        case 5: return keysFlick;
-        case 6: return controllersFlick;
-        case 7: return remoteFlick;
-        case 8: return configFlick;
+        case 3: return audioFlick;
+        case 4: return wifiFlick;
+        case 5: return consolesFlick;
+        case 6: return keysFlick;
+        case 7: return controllersFlick;
+        case 8: return remoteFlick;
+        case 9: return configFlick;
         default: return null;
         }
     }
@@ -252,8 +289,8 @@ DialogView {
             }
 
             TabButton {
-                text: qsTr("Audio/Wifi")
                 id: audio
+                text: qsTr("Audio")
                 focusPolicy: Qt.NoFocus
                 Image {
                     anchors {
@@ -282,12 +319,12 @@ DialogView {
             }
 
             TabButton {
-                text: qsTr("Consoles")
-                id: consoles
+                id: wifi
+                text: qsTr("Wifi")
                 focusPolicy: Qt.NoFocus
                 Image {
                     anchors {
-                        right: consoles.left
+                        right: wifi.left
                         verticalCenter: parent.verticalCenter
                         rightMargin: -15
                     }
@@ -299,7 +336,7 @@ DialogView {
                 }
                 Image {
                     anchors {
-                        left: consoles.right
+                        left: wifi.right
                         verticalCenter: parent.verticalCenter
                         leftMargin: -15
                     }
@@ -312,12 +349,12 @@ DialogView {
             }
 
             TabButton {
-                text: qsTr("Keys")
-                id: keys
+                id: consoles
+                text: qsTr("Consoles")
                 focusPolicy: Qt.NoFocus
                 Image {
                     anchors {
-                        right: keys.left
+                        right: consoles.left
                         verticalCenter: parent.verticalCenter
                         rightMargin: -15
                     }
@@ -329,7 +366,7 @@ DialogView {
                 }
                 Image {
                     anchors {
-                        left: keys.right
+                        left: consoles.right
                         verticalCenter: parent.verticalCenter
                         leftMargin: -15
                     }
@@ -342,12 +379,12 @@ DialogView {
             }
 
             TabButton {
-                text: qsTr("Controllers")
-                id: controllers
+                id: keys
+                text: qsTr("Keys")
                 focusPolicy: Qt.NoFocus
                 Image {
                     anchors {
-                        right: controllers.left
+                        right: keys.left
                         verticalCenter: parent.verticalCenter
                         rightMargin: -15
                     }
@@ -359,7 +396,7 @@ DialogView {
                 }
                 Image {
                     anchors {
-                        left: controllers.right
+                        left: keys.right
                         verticalCenter: parent.verticalCenter
                         leftMargin: -15
                     }
@@ -372,12 +409,12 @@ DialogView {
             }
 
             TabButton {
-                text: qsTr("Remote")
-                id: remote
+                id: controllers
+                text: qsTr("Controllers")
                 focusPolicy: Qt.NoFocus
                 Image {
                     anchors {
-                        right: remote.left
+                        right: controllers.left
                         verticalCenter: parent.verticalCenter
                         rightMargin: -15
                     }
@@ -389,7 +426,7 @@ DialogView {
                 }
                 Image {
                     anchors {
-                        left: remote.right
+                        left: controllers.right
                         verticalCenter: parent.verticalCenter
                         leftMargin: -15
                     }
@@ -402,20 +439,125 @@ DialogView {
             }
 
             TabButton {
-                text: qsTr("Config")
-                id: config
+                id: remote
+                text: qsTr("Remote")
                 focusPolicy: Qt.NoFocus
                 Image {
                     anchors {
-                        left: config.left
+                        right: remote.left
                         verticalCenter: parent.verticalCenter
-                        leftMargin: -15
+                        rightMargin: -15
                     }
                     width: 28
                     height: 28
                     sourceSize: Qt.size(width, height)
                     source: "qrc:/icons/r1.svg"
                     visible: bar.currentIndex == 7
+                }
+                Image {
+                    anchors {
+                        left: remote.right
+                        verticalCenter: parent.verticalCenter
+                        leftMargin: -15
+                    }
+                    width: 28
+                    height: 28
+                    sourceSize: Qt.size(width, height)
+                    source: "qrc:/icons/l1.svg"
+                    visible: bar.currentIndex == 9
+                }
+            }
+
+            TabButton {
+                id: config
+                text: qsTr("Config")
+                focusPolicy: Qt.NoFocus
+                Image {
+                    anchors {
+                        right: config.left
+                        verticalCenter: parent.verticalCenter
+                        rightMargin: -15
+                    }
+                    width: 28
+                    height: 28
+                    sourceSize: Qt.size(width, height)
+                    source: "qrc:/icons/r1.svg"
+                    visible: bar.currentIndex == 8
+                }
+            }
+        }
+
+        Timer {
+            interval: 250
+            repeat: true
+            running: dialog.visible
+            onTriggered: {
+                const changed = Chiaki.settings.hasUnsavedChanges();
+                if (changed !== dialog.dirty)
+                    dialog.dirty = changed;
+                if (changed)
+                    dialog.justSaved = false;
+            }
+        }
+
+        Timer {
+            id: savedTimer
+            interval: 2500
+            onTriggered: dialog.justSaved = false
+        }
+
+        Rectangle {
+            id: footerBar
+            anchors {
+                left: parent.left
+                right: parent.right
+                bottom: parent.bottom
+            }
+            height: 68
+            color: Material.background
+
+            Rectangle {
+                anchors {
+                    left: parent.left
+                    right: parent.right
+                    top: parent.top
+                }
+                height: 1
+                color: Qt.alpha(Material.foreground, 0.12)
+            }
+
+            RowLayout {
+                anchors {
+                    fill: parent
+                    leftMargin: 24
+                    rightMargin: 24
+                }
+                spacing: 16
+
+                Label {
+                    Layout.fillWidth: true
+                    elide: Text.ElideRight
+                    font.pixelSize: 15
+                    text: dialog.justSaved ? qsTr("✓ Settings saved")
+                          : (dialog.dirty ? qsTr("● Unsaved changes: they only take effect once you press Save")
+                                          : qsTr("✓ All changes saved"))
+                    color: dialog.dirty ? Material.accent : Material.hintTextColor
+                }
+
+                Button {
+                    text: qsTr("Discard")
+                    flat: true
+                    enabled: dialog.dirty
+                    focusPolicy: Qt.NoFocus
+                    onClicked: dialog.discardChanges()
+                }
+
+                Button {
+                    text: qsTr("Save")
+                    highlighted: true
+                    enabled: dialog.dirty
+                    focusPolicy: Qt.NoFocus
+                    onClicked: dialog.saveChanges()
                 }
             }
         }
@@ -425,7 +567,7 @@ DialogView {
                 top: bar.bottom
                 left: parent.left
                 right: parent.right
-                bottom: parent.bottom
+                bottom: footerBar.top
             }
             currentIndex: bar.currentIndex
             onCurrentIndexChanged: {
@@ -608,6 +750,25 @@ DialogView {
 
                         Label {
                             Layout.alignment: Qt.AlignRight
+                            text: qsTr("Appearance:")
+                        }
+                        C.ComboBox {
+                            id: themeModeCombo
+                            Layout.preferredWidth: 400
+                            model: [qsTr("System"), qsTr("Light"), qsTr("Dark")]
+                            currentIndex: Chiaki.settings.themeMode
+                            onActivated: (index) => Chiaki.settings.themeMode = index
+                            KeyNavigation.priority: popup.visible ? KeyNavigation.AfterItem : KeyNavigation.BeforeItem
+                            KeyNavigation.up: streamerMode
+                            KeyNavigation.down: streamMenu
+                        }
+                        Label {
+                            Layout.alignment: Qt.AlignRight
+                            text: qsTr("(Light)")
+                        }
+
+                        Label {
+                            Layout.alignment: Qt.AlignRight
                             text: qsTr("Stream Menu Shortcut Enabled")
                         }
                         C.CheckBox {
@@ -615,7 +776,7 @@ DialogView {
                             checked: Chiaki.settings.streamMenuEnabled
                             onToggled: Chiaki.settings.streamMenuEnabled = !Chiaki.settings.streamMenuEnabled
                             KeyNavigation.priority: KeyNavigation.BeforeItem
-                            KeyNavigation.up: streamerMode
+                            KeyNavigation.up: themeModeCombo
                             KeyNavigation.left: streamMenu
                             KeyNavigation.right: streamMenu
                             KeyNavigation.down: {
@@ -791,24 +952,6 @@ DialogView {
                     Label {
                         Layout.alignment: Qt.AlignRight
                         text: qsTr("(Auto)")
-                    }
-
-                    Label {
-                        Layout.alignment: Qt.AlignRight
-                        text: qsTr("Appearance:")
-                    }
-
-                    C.ComboBox {
-                        id: themeModeCombo
-                        Layout.preferredWidth: 400
-                        model: [qsTr("System"), qsTr("Light"), qsTr("Dark")]
-                        currentIndex: Chiaki.settings.themeMode
-                        onActivated: (index) => Chiaki.settings.themeMode = index;
-                    }
-
-                    Label {
-                        Layout.alignment: Qt.AlignRight
-                        text: qsTr("(Light)")
                     }
 
                     Label {
@@ -1546,25 +1689,25 @@ DialogView {
             }
 
             Item {
-                // Audio and Wifi
+                // Audio
                 Flickable {
-                    id: audiowifiFlick
+                    id: audioFlick
                     anchors {
                         fill: parent
                         topMargin: 20
                         bottomMargin: 20
                     }
                     clip: true
-                    contentWidth: Math.max(width, audiowifigrid.width)
-                    contentHeight: audiowifigrid.height
+                    contentWidth: Math.max(width, audiogrid.width)
+                    contentHeight: audiogrid.height
                     flickableDirection: Flickable.AutoFlickIfNeeded
                     ScrollBar.vertical: ScrollBar {
-                        id: audiowifiScrollbar
+                        id: audioScrollbar
                         policy: ScrollBar.AlwaysOn
-                        visible: audiowifiFlick.contentHeight > audiowifiFlick.height
+                        visible: audioFlick.contentHeight > audioFlick.height
                     }
                     GridLayout {
-                        id: audiowifigrid
+                        id: audiogrid
                         columns: 3
                         rowSpacing: 10
                         columnSpacing: 20
@@ -1780,12 +1923,45 @@ DialogView {
                             visible: if (typeof Chiaki.settings.speechProcessing !== "undefined") {Chiaki.settings.speechProcessing} else {false}
                         }
 
+                    }
+                }
+            }
+
+            Item {
+                // Wifi
+                Flickable {
+                    id: wifiFlick
+                    anchors {
+                        fill: parent
+                        topMargin: 20
+                        bottomMargin: 20
+                    }
+                    clip: true
+                    contentWidth: Math.max(width, wifigrid.width)
+                    contentHeight: wifigrid.height
+                    flickableDirection: Flickable.AutoFlickIfNeeded
+                    ScrollBar.vertical: ScrollBar {
+                        id: wifiScrollbar
+                        policy: ScrollBar.AlwaysOn
+                        visible: wifiFlick.contentHeight > wifiFlick.height
+                    }
+                    GridLayout {
+                        id: wifigrid
+                        columns: 3
+                        rowSpacing: 10
+                        columnSpacing: 20
+
+                        anchors {
+                            top: parent.top
+                            horizontalCenter: parent.horizontalCenter
+                        }
                         Label {
                             Layout.alignment: Qt.AlignRight
                             text: qsTr("Weak Wifi Notification:")
                         }
 
                         C.Slider {
+                            id: weakWifiSlider
                             Layout.preferredWidth: 250
                             from: 0
                             to: 100

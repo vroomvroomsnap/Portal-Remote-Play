@@ -12,11 +12,15 @@ Item {
     property alias buttonVisible: okButton.visible
     property Item restoreFocusItem
     default property Item mainItem: null
+    // Optional: return true to stop the dialog from closing (e.g. to ask about unsaved changes)
+    property var closeGuard: null
 
     signal accepted()
     signal rejected()
 
     function close() {
+        if (closeGuard && closeGuard())
+            return;
         root.closeDialog();
     }
 
@@ -57,6 +61,8 @@ Item {
             right: parent.right
         }
         height: 80
+        Material.elevation: 0
+        Material.foreground: root.Material.foreground
 
         RowLayout {
             anchors {

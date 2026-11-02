@@ -1887,6 +1887,39 @@ void QmlSettings::setSettings(Settings *new_settings)
     refreshAllKeys();
 }
 
+void QmlSettings::beginEdit()
+{
+    edit_snapshot = settings->SnapshotEditableSettings();
+    edit_active = true;
+}
+
+bool QmlSettings::hasUnsavedChanges() const
+{
+    return edit_active && settings->EditableSettingsDiffer(edit_snapshot);
+}
+
+void QmlSettings::saveEdit()
+{
+    // Values are already stored; this makes them the new baseline and flushes them to disk.
+    edit_snapshot = settings->SnapshotEditableSettings();
+    edit_active = true;
+}
+
+void QmlSettings::discardEdit()
+{
+    if(!edit_active)
+        return;
+    settings->RestoreEditableSettings(edit_snapshot);
+    refreshAllKeys();
+}
+
+void QmlSettings::discardEditQuietly()
+{
+    if(!edit_active)
+        return;
+    settings->RestoreEditableSettings(edit_snapshot);
+}
+
 void QmlSettings::refreshAllKeys()
 {
     emit remotePlayAskChanged();

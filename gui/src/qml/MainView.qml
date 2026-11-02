@@ -76,6 +76,8 @@ Pane {
             right: parent.right
         }
         height: 80
+        Material.elevation: 0
+        Material.foreground: root.Material.foreground
 
         RowLayout {
             anchors {
@@ -209,9 +211,19 @@ Pane {
             visible: modelData.display
             id: delegate
             width: parent ? parent.width : 0
-            height: modelData.display ? 180 : 0
+            height: modelData.display ? 200 : 0
             highlighted: ListView.isCurrentItem
             onClicked: connectToHost()
+            leftInset: 40
+            rightInset: 40
+            topInset: 10
+            bottomInset: 10
+            background: Rectangle {
+                radius: 22
+                color: delegate.highlighted ? Qt.alpha(Material.accent, 0.14) : (root.darkMode ? "#1C1C1E" : "#F0F0F5")
+                border.width: delegate.highlighted ? 2 : 1
+                border.color: delegate.highlighted ? Material.accent : Qt.alpha(Material.foreground, 0.10)
+            }
 
             function connectToHost() {
                 if(modelData.discovered)
@@ -241,10 +253,10 @@ Pane {
             RowLayout {
                 anchors {
                     fill: parent
-                    leftMargin: 30
-                    rightMargin: 10
-                    topMargin: 10
-                    bottomMargin: 10
+                    leftMargin: 70
+                    rightMargin: 50
+                    topMargin: 20
+                    bottomMargin: 20
                 }
                 spacing: 50
 

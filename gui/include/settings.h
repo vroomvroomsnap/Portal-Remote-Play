@@ -371,6 +371,12 @@ class Settings : public QObject
 		int GetThemeMode() const;
 		void SetThemeMode(int mode);
 
+		// Save / Discard support for the Settings screen. Only plain preference values are covered;
+		// PSN sign-in, profiles, window geometry and auto-connect state are never rolled back.
+		QVariantMap SnapshotEditableSettings() const;
+		bool EditableSettingsDiffer(const QVariantMap &snapshot) const;
+		void RestoreEditableSettings(const QVariantMap &snapshot);
+
 		uint GetCustomResolutionWidth() const;
 		void SetCustomResolutionWidth(uint width);
 

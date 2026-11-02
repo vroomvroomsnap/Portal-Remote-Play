@@ -1,0 +1,40 @@
+name: QML syntax check
+
+# Fast check (about a minute, runs on Linux) so QML mistakes show up before a macOS build is started.
+on:
+  push:
+    paths:
+      - 'gui/src/qml/**'
+      - '.github/workflows/qml-lint.yml'
+  workflow_dispatch:
+
+jobs:
+  qmllint:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install qmllint
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y qt6-declarative-dev-tools
+          dpkg -L qt6-declarative-dev-tools | grep -E '/qmllint$' | head -1
+
+      - name: Lint all QML files
+        run: |
+          QMLLINT=$(dpkg -L qt6-declarative-dev-tools | grep -E '/qmllint$' | head -1)
+          echo "Using $QMLLINT"
+          fail=0
+          for f in gui/src/qml/*.qml; do
+            out=$("$QMLLINT" "$f" 2>&1)
+            # Only real parse errors fail the job. Unknown module / unqualified-access warnings are expected
+            # because the app's own C++ types (org.streetpea.chiaking) are not available on this runner.
+            if echo "$out" | grep -qiE "syntax|expected|unexpected|unterminated|duplicate|invalid"; then
+              echo "::error file=$f::QML problem"
+              echo "$out" | grep -iE "syntax|expected|unexpected|unterminated|duplicate|invalid" | head -20
+              fail=1
+            else
+              echo "ok  $f"
+            fi
+          done
+          exit $fail

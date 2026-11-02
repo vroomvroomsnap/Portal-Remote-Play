@@ -591,6 +591,13 @@ public:
 
     void setSettings(Settings *new_settings);
     void refreshAllKeys();
+
+    // Settings screen Save / Discard
+    Q_INVOKABLE void beginEdit();
+    Q_INVOKABLE bool hasUnsavedChanges() const;
+    Q_INVOKABLE void saveEdit();
+    Q_INVOKABLE void discardEdit();
+    Q_INVOKABLE void discardEditQuietly();
     void refreshAllPlaceboKeys();
 
     QString logDirectory() const;
@@ -773,6 +780,8 @@ signals:
 
 private:
     Settings *settings = {};
+    QVariantMap edit_snapshot;
+    bool edit_active = false;
     QStringList audio_in_devices;
     QStringList audio_out_devices;
 };
